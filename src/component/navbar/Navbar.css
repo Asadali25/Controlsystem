@@ -1,0 +1,57 @@
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    position: relative;
+} 
+
+
+
+.time {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    /* Shadow */
+    background-color: #FFFFFF;
+    /* Background color */
+    border-radius: 3px;
+    /* Optional: Rounding the corners */
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-family: Inter;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 38.73px;
+    text-align: left;
+
+}
+
+.order-number {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.time-paused {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.paused-time {
+    font-weight: bold;
+    color: #000000;
+    border: 2px solid #7AB915;
+    border-radius: 3px;
+    font-size: 18px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #FFFFFF;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
+.timer-box
+{
+    position: absolute;
+    top: 40px;
+}
