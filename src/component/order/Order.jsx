@@ -62,3 +62,5 @@ export const OrderProvider = ({ children }) => {
     </OrderContext.Provider>
   );
 };
+
+export default OrderProvider;
