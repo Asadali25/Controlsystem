@@ -11,11 +11,8 @@ const Navbar = () => {
   const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
   const currentTime = hours + ":" + formattedMinutes;
 
-  const { currentOrderNumber } = useContext(OrderContext);
+  const { currentOrderNumber, isPaused, setIsPaused } = useContext(OrderContext);
 
-  const [isPaused, setIsPaused] = useState(() => {
-    return localStorage.getItem("isPaused") === "true";
-  });
   const [pausedTime, setPausedTime] = useState(0);
 
   useEffect(() => {
@@ -28,7 +25,7 @@ const Navbar = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, []);
+  }, [setIsPaused]);
 
   useEffect(() => {
     let interval;

@@ -15,8 +15,8 @@ function App() {
         <BrowserRouter>
           <Navbar pausedTime={pausedTime}/>
           <Routes>
-            <Route path="/product" element={<Product setPausedTime={setPausedTime}/>} />
-            <Route path="/" element={<Order/>} />
+            <Route path="/" element={<Product setPausedTime={setPausedTime}/>} />
+            <Route path="/control" element={<Order/>} />
           </Routes>
         </BrowserRouter>
       </div>

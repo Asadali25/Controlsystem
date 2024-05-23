@@ -12,6 +12,9 @@ export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState(() => {
     return JSON.parse(localStorage.getItem('orders')) || [];
   });
+  const [isPaused, setIsPaused] = useState(() => {
+    return localStorage.getItem('isPaused') === 'true';
+  });
 
   useEffect(() => {
     localStorage.setItem('currentOrderNumber', currentOrderNumber);
@@ -24,6 +27,10 @@ export const OrderProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('orders', JSON.stringify(orders));
   }, [orders]);
+
+  useEffect(() => {
+    localStorage.setItem('isPaused', isPaused);
+  }, [isPaused]);
 
   useEffect(() => {
     if (orders.length > 0) {
@@ -46,7 +53,9 @@ export const OrderProvider = ({ children }) => {
         currentSequenceNumber,
         setCurrentSequenceNumber,
         orders,
-        setOrders
+        setOrders,
+        isPaused,
+        setIsPaused
       }}
     >
       {children}

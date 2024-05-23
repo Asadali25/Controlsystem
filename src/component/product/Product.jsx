@@ -7,9 +7,8 @@ import './Product.css';
 
 const Product = () => {
   const navigate = useNavigate();
-  const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders } = useContext(OrderContext);
+  const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders, isPaused , setIsPaused} = useContext(OrderContext);
   const [sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber);
-  const [isPaused, setIsPaused] = useState(false);
   const location = useLocation();
   const initialOrders = location.state?.orders || orders;
 
@@ -61,7 +60,7 @@ const Product = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, []);
+  }, [setIsPaused]);
 
   // Countdown renderer
   const renderer = ({ hours, minutes, seconds, completed }) => {
@@ -69,8 +68,15 @@ const Product = () => {
     const className = halfTimeReached ? "counter half-time" : "counter";
 
     if (completed) {
-      if (sequenceNumber < Object.keys(groupedOrders).length - 1) {
-        setSequenceNumber(sequenceNumber + 1);
+      // Advance to the next sequence number
+      const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
+      const maxSequence = Math.max(...sequences);
+      if (sequenceNumber < maxSequence) {
+        const newSequenceNumber = sequenceNumber + 1;
+        setSequenceNumber(newSequenceNumber);
+        setCurrentSequenceNumber(newSequenceNumber);
+        localStorage.setItem('sequenceNumber', newSequenceNumber);
+        window.dispatchEvent(new Event('storage'));
       }
       return <span className={className}>Packing complete!</span>;
     } else {
@@ -81,6 +87,10 @@ const Product = () => {
       );
     }
   };
+
+  function handleSettingsClick() {
+    window.open('/control', '_blank');
+  }
 
   return (
     <div className="product_parent">
@@ -119,9 +129,9 @@ const Product = () => {
                 </div>
               )}
             </div>
-            {/* <div className="navigator">
+            <div className="navigator">
               <span className="setting-icon" onClick={handleSettingsClick}><IoSettingsOutline /></span>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
