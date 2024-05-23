@@ -1,66 +1,107 @@
-import { createContext, useState, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { OrderContext } from "../../OrderContext";
+import "./Order.css";
 
-export const OrderContext = createContext();
+function Order() {
+  const navigate = useNavigate();
+  const { orders, setOrders, currentSequenceNumber, setCurrentSequenceNumber, setCurrentOrderNumber, isPaused, setIsPaused } = useContext(OrderContext);
 
-export const OrderProvider = ({ children }) => {
-  const [currentOrderNumber, setCurrentOrderNumber] = useState(() => {
-    return localStorage.getItem('currentOrderNumber') || null;
-  });
-  const [currentSequenceNumber, setCurrentSequenceNumber] = useState(() => {
-    return parseInt(localStorage.getItem('currentSequenceNumber'), 10) || 0;
-  });
-  const [orders, setOrders] = useState(() => {
-    return JSON.parse(localStorage.getItem('orders')) || [];
-  });
-  const [isPaused, setIsPaused] = useState(() => {
-    return localStorage.getItem('isPaused') === 'true';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('currentOrderNumber', currentOrderNumber);
-  }, [currentOrderNumber]);
-
-  useEffect(() => {
-    localStorage.setItem('currentSequenceNumber', currentSequenceNumber);
-  }, [currentSequenceNumber]);
-
-  useEffect(() => {
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }, [orders]);
+  async function fetchOrders() {
+    try {
+      const result = await fetch("https://sheetdb.io/api/v1/tyb2c31tf86n8", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+        },
+      });
+      const response = await result.json();
+      setOrders(response);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  }
 
   useEffect(() => {
-    localStorage.setItem('isPaused', isPaused);
-  }, [isPaused]);
+    fetchOrders();
+
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 3600000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (orders.length > 0) {
       const currentOrder = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
       if (currentOrder) {
-        setCurrentOrderNumber(currentOrder.order_number);
-      } else {
-        setCurrentOrderNumber(null);
+        setCurrentOrderNumber(currentOrder.orderNumber);  // Update current order number
       }
-    } else {
-      setCurrentOrderNumber(null);
     }
-  }, [currentSequenceNumber, orders]);
+  }, [currentSequenceNumber, orders, setCurrentOrderNumber]);
+
+  function startPause(e) {
+    e.preventDefault();
+    const newPausedState = !isPaused;
+    setIsPaused(newPausedState);
+    localStorage.setItem("isPaused", newPausedState);
+    window.dispatchEvent(new Event('storage'));
+  }
+
+  function handlePreviousOrder() {
+    if (currentSequenceNumber > 1) {
+      const newSequenceNumber = currentSequenceNumber - 1;
+      setCurrentSequenceNumber(newSequenceNumber);
+      localStorage.setItem("sequenceNumber", newSequenceNumber);
+      console.log("sequenceNumber", newSequenceNumber);
+      window.dispatchEvent(new Event('storage'));
+    }
+  }
+
+  function handleNextOrder() {
+    const sequences = new Set(orders.map(order => parseInt(order.sequence, 10)));
+    if (currentSequenceNumber >= Math.max(...sequences)) {
+      console.log("No more orders");
+      return;
+    }
+    const newSequenceNumber = currentSequenceNumber + 1;
+    setCurrentSequenceNumber(newSequenceNumber);
+    localStorage.setItem("sequenceNumber", newSequenceNumber);
+    console.log("sequenceNumber", newSequenceNumber);
+    window.dispatchEvent(new Event('storage'));
+  }
+
+  // Open current order(from gsheet) url in new tab
+  function openUrl() {
+    const obj = (orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber));
+    if (obj) {
+      window.open(obj.order_url, '_blank');
+    }
+  }
 
   return (
-    <OrderContext.Provider
-      value={{
-        currentOrderNumber,
-        setCurrentOrderNumber,
-        currentSequenceNumber,
-        setCurrentSequenceNumber,
-        orders,
-        setOrders,
-        isPaused,
-        setIsPaused
-      }}
-    >
-      {children}
-    </OrderContext.Provider>
-  );
-};
+    <div className="container order_container">
+      <div className="row">
+        <div className="program_control">
+          <button type="button" onClick={startPause}>{isPaused ? 'Start' : 'Pause'} Autoprogram</button>
+        </div>
+      </div>
 
-export default OrderProvider;
+      <div className="row">
+        <div className="switch_order">
+          <button onClick={handlePreviousOrder}>Previous Order</button>
+          <button onClick={handleNextOrder}>Next Order</button>
+        </div>
+      </div>
+      <div className="row">
+        <div className="program_control">
+          <button type="button" onClick={openUrl}> View Order</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Order;
