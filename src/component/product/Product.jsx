@@ -104,7 +104,7 @@ const Product = () => {
                 <h1 className="instruction_heading">Specific instructions:</h1>
               </div>
               <div className="instruction_content">
-                <span>{currentSequenceOrders[0]?.Instructions || "No specific instructions"}</span>
+                <span>{currentSequenceOrders[0]?.Instructions || ""}</span>
               </div>
             </div>
           </div>
