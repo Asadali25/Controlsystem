@@ -25,6 +25,19 @@ export const OrderProvider = ({ children }) => {
     localStorage.setItem('orders', JSON.stringify(orders));
   }, [orders]);
 
+  useEffect(() => {
+    if (orders.length > 0) {
+      const currentOrder = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
+      if (currentOrder) {
+        setCurrentOrderNumber(currentOrder.order_number);
+      } else {
+        setCurrentOrderNumber(null);
+      }
+    } else {
+      setCurrentOrderNumber(null);
+    }
+  }, [currentSequenceNumber, orders]);
+
   return (
     <OrderContext.Provider
       value={{

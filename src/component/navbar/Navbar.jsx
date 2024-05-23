@@ -55,7 +55,7 @@ const Navbar = () => {
         <span className="time">{currentTime}</span>
       </div>
       <div className="navbar-center">
-        <span className="order-number">{`ORDER #${currentOrderNumber}`}</span>
+        <span className="order-number">{`ORDER #${currentOrderNumber || 'N/A'}`}</span>
       </div>
       <div className="navbar-right">
         <div className="time_heading">

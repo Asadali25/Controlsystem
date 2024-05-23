@@ -29,7 +29,7 @@ const Product = () => {
   }, {});
 
   // Get current sequence orders and total packing time
-  const currentSequenceOrders = groupedOrders[sequenceNumber + 1] || [];
+  const currentSequenceOrders = groupedOrders[sequenceNumber] || [];
   const totalPackingTimeSec = currentSequenceOrders.reduce((total, order) => {
     return total + parseInt(order.packing_time_sec, 10);
   }, 0);
