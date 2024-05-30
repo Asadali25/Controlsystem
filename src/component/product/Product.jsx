@@ -7,7 +7,9 @@ import './Product.css';
 
 const Product = () => {
   const navigate = useNavigate();
-  const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders, isPaused , setIsPaused} = useContext(OrderContext);
+
+  const [packedDone, setPackedDone] = useState(false);
+  const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders, isPaused, setIsPaused } = useContext(OrderContext);
   const [sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber);
   const location = useLocation();
   const initialOrders = location.state?.orders || orders;
@@ -63,22 +65,26 @@ const Product = () => {
   }, [setIsPaused]);
 
   // Countdown renderer
-  const renderer = ({ hours, minutes, seconds, completed }) => {
-    const halfTimeReached = hours * 3600 + minutes * 60 + seconds <= timerValue / 2;
+  const renderer = ({ minutes, seconds, completed }) => {
+    const halfTimeReached = minutes * 60 + seconds <= timerValue / 2;
     const className = halfTimeReached ? "counter half-time" : "counter";
 
     if (completed) {
-      // Advance to the next sequence number
-      const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
-      const maxSequence = Math.max(...sequences);
-      if (sequenceNumber < maxSequence) {
-        const newSequenceNumber = sequenceNumber + 1;
-        setSequenceNumber(newSequenceNumber);
-        setCurrentSequenceNumber(newSequenceNumber);
-        localStorage.setItem('sequenceNumber', newSequenceNumber);
-        window.dispatchEvent(new Event('storage'));
-      }
-      return <span className={className}>Packing complete!</span>;
+      setTimeout(() => {
+        // Advance to the next sequence number after 10 seconds
+        const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
+        const maxSequence = Math.max(...sequences);
+        if (sequenceNumber < maxSequence) {
+          const newSequenceNumber = sequenceNumber + 1;
+          setSequenceNumber(newSequenceNumber);
+          setCurrentSequenceNumber(newSequenceNumber);
+          localStorage.setItem('sequenceNumber', newSequenceNumber);
+          window.dispatchEvent(new Event('storage'));
+        }
+      }, 6000);
+        setPackedDone(true);
+
+      return <span className={`${className} complete`}>Order packed! Going to next</span>;
     } else {
       return (
         <span className={className}>
@@ -93,7 +99,7 @@ const Product = () => {
   }
 
   return (
-    <div className="product_parent">
+    <div className={`product_parent `}>
       <div className="container product_container" style={{ width: currentSequenceOrders.length > 4 ? "639.33px" : "940.05px" }}>
         <div className="items">
           {currentSequenceOrders.map((order, index) => (
@@ -108,24 +114,26 @@ const Product = () => {
       </div>
       <div className="container ins_container">
         <div className="row ins_row">
-          <div className="col-lg-6 ins">
-            <div className="ins_section">
-              <div className="ins_header">
-                <h1 className="instruction_heading">Specific instructions:</h1>
-              </div>
-              <div className="instruction_content">
-                <span>{currentSequenceOrders[0]?.Instructions || ""}</span>
+          {!currentSequenceOrders[0]?.Instructions == "" &&(
+            <div className="col-lg-6 ins">
+              <div className="ins_section">
+                <div className="ins_header">
+                  <h1 className="instruction_heading">Specific instructions:</h1>
+                </div>
+                <div className="instruction_content">
+                  <span>{currentSequenceOrders[0]?.Instructions || ""}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="col-lg-6 timer_counter">
             <div className="next_order_section">
               <div className="next_order_heading">
-                <h1 className="next_order_heading">TIME TILL NEXT ORDER</h1>
+                <h1 className={`next_order_heading `}>TIME TILL NEXT ORDER</h1>
               </div>
               {!isPaused && (
-                <div className={renderer.className}>
-                  <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />
+                <div className={`${!packedDone ? "background-green" : ""} ${renderer.className  }`}>
+                  <Countdown date={Date.now() + timerValue * 20} renderer={renderer} key={sequenceNumber} />
                 </div>
               )}
             </div>

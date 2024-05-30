@@ -6,6 +6,8 @@ import "./Order.css";
 function Order() {
   const navigate = useNavigate();
   const { orders, setOrders, currentSequenceNumber, setCurrentSequenceNumber, setCurrentOrderNumber, isPaused, setIsPaused } = useContext(OrderContext);
+  const [pausedTime, setPausedTime] = useState(0);
+  const [pauseStartTime, setPauseStartTime] = useState(null);
 
   async function fetchOrders() {
     try {
@@ -18,17 +20,18 @@ function Order() {
       });
       const response = await result.json();
       setOrders(response);
+      console.log("orders", response);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   }
-
+  
   useEffect(() => {
     fetchOrders();
 
     const interval = setInterval(() => {
       fetchOrders();
-    }, 3600000);
+    }, 360000);
 
     return () => clearInterval(interval);
   }, []);
@@ -42,6 +45,25 @@ function Order() {
     }
   }, [currentSequenceNumber, orders, setCurrentOrderNumber]);
 
+  useEffect(() => {
+    let interval;
+    if (isPaused) {
+      setPauseStartTime(Date.now());
+      clearInterval(interval);
+    } else {
+      if (pauseStartTime) {
+        const pausedDuration = Math.floor((Date.now() - pauseStartTime) / 1000);
+        setPausedTime(pausedTime + pausedDuration);
+        setPauseStartTime(null);
+      }
+      interval = setInterval(() => {
+        setPausedTime(prevTime => prevTime + 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isPaused, pauseStartTime, pausedTime]);
+
   function startPause(e) {
     e.preventDefault();
     const newPausedState = !isPaused;
@@ -50,7 +72,8 @@ function Order() {
     window.dispatchEvent(new Event('storage'));
   }
 
-  function handlePreviousOrder() {
+  function handlePreviousOrder(e) {
+    e.preventDefault();
     if (currentSequenceNumber > 1) {
       const newSequenceNumber = currentSequenceNumber - 1;
       setCurrentSequenceNumber(newSequenceNumber);
@@ -58,9 +81,13 @@ function Order() {
       console.log("sequenceNumber", newSequenceNumber);
       window.dispatchEvent(new Event('storage'));
     }
+    if (!isPaused) {
+      startPause(e);
+    }
   }
 
-  function handleNextOrder() {
+  function handleNextOrder(e) {
+    e.preventDefault();
     const sequences = new Set(orders.map(order => parseInt(order.sequence, 10)));
     if (currentSequenceNumber >= Math.max(...sequences)) {
       console.log("No more orders");
@@ -71,6 +98,10 @@ function Order() {
     localStorage.setItem("sequenceNumber", newSequenceNumber);
     console.log("sequenceNumber", newSequenceNumber);
     window.dispatchEvent(new Event('storage'));
+    if (isPaused) {
+      startPause(e);
+    }
+   
   }
 
   // Open current order(from gsheet) url in new tab
@@ -85,7 +116,7 @@ function Order() {
     <div className="container order_container">
       <div className="row">
         <div className="program_control">
-          <button type="button" onClick={startPause}>{isPaused ? 'Start' : 'Pause'} Autoprogram</button>
+          <button type="button" onClick={startPause}>{!isPaused ? 'Start' : 'Pause'} Autoprogram</button>
         </div>
       </div>
 

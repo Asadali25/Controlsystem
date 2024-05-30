@@ -13,17 +13,24 @@ const Navbar = () => {
 
   const { currentOrderNumber, isPaused, setIsPaused } = useContext(OrderContext);
 
-  const [pausedTime, setPausedTime] = useState(0);
+  const [pausedTime, setPausedTime] = useState(() => {
+    const savedPausedTime = localStorage.getItem("pausedTime");
+    return savedPausedTime ? parseInt(savedPausedTime, 10) : 0;
+  });
 
   useEffect(() => {
     const handleStorageChange = () => {
       setIsPaused(localStorage.getItem("isPaused") === "true");
+      const savedPausedTime = localStorage.getItem("pausedTime");
+      if (savedPausedTime) {
+        setPausedTime(parseInt(savedPausedTime, 10));
+      }
     };
 
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, [setIsPaused]);
 
@@ -31,11 +38,14 @@ const Navbar = () => {
     let interval;
     if (isPaused) {
       interval = setInterval(() => {
-        setPausedTime(prevTime => prevTime + 1);
+        setPausedTime((prevTime) => {
+          const newTime = prevTime + 1;
+          localStorage.setItem("pausedTime", newTime);
+          return newTime;
+        });
       }, 1000);
     } else {
       clearInterval(interval);
-      setPausedTime(0);
     }
     return () => clearInterval(interval);
   }, [isPaused]);
@@ -56,7 +66,7 @@ const Navbar = () => {
       </div>
       <div className="navbar-right">
         <div className="time_heading">
-          <span className="time-paused">{isPaused ? "TIME PAUSED" : "TIME RUNNING"}</span>
+          <span className="time-paused">{isPaused ? "TIME Running" : "TIME Paused"}</span>
         </div>
         <div className="timer-box">
           <span className="paused-time">{formatTime(pausedTime)}</span>
