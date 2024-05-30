@@ -11,8 +11,11 @@ const Product = () => {
   const [packedDone, setPackedDone] = useState(false);
   const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders, isPaused, setIsPaused } = useContext(OrderContext);
   const [sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber);
+  const [backgroundColor, setBackgroundColor] = useState('white');
+
   const location = useLocation();
   const initialOrders = location.state?.orders || orders;
+
 
   useEffect(() => {
     if (initialOrders.length > 0) {
@@ -28,6 +31,8 @@ const Product = () => {
     acc[order.sequence].push(order);
     return acc;
   }, {});
+
+
 
   // Get current sequence orders and total packing time
   const currentSequenceOrders = groupedOrders[sequenceNumber] || [];
@@ -70,8 +75,8 @@ const Product = () => {
     const className = halfTimeReached ? "counter half-time" : "counter";
 
     if (completed) {
+      setBackgroundColor('green')
       setTimeout(() => {
-        // Advance to the next sequence number after 10 seconds
         const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
         const maxSequence = Math.max(...sequences);
         if (sequenceNumber < maxSequence) {
@@ -81,10 +86,9 @@ const Product = () => {
           localStorage.setItem('sequenceNumber', newSequenceNumber);
           window.dispatchEvent(new Event('storage'));
         }
-      }, 6000);
+        setBackgroundColor('white');
         setPackedDone(true);
-
-      return <span className={`${className} complete`}>Order packed! Going to next</span>;
+      }, 10000);
     } else {
       return (
         <span className={className}>
@@ -99,7 +103,7 @@ const Product = () => {
   }
 
   return (
-    <div className={`product_parent `}>
+    <div className={`product_parent `} style={{ backgroundColor: backgroundColor }}>
       <div className="container product_container" style={{ width: currentSequenceOrders.length > 4 ? "639.33px" : "940.05px" }}>
         <div className="items">
           {currentSequenceOrders.map((order, index) => (
@@ -114,7 +118,7 @@ const Product = () => {
       </div>
       <div className="container ins_container">
         <div className="row ins_row">
-          {!currentSequenceOrders[0]?.Instructions == "" &&(
+          {!currentSequenceOrders[0]?.Instructions == "" && (
             <div className="col-lg-6 ins">
               <div className="ins_section">
                 <div className="ins_header">
@@ -132,8 +136,15 @@ const Product = () => {
                 <h1 className={`next_order_heading `}>TIME TILL NEXT ORDER</h1>
               </div>
               {!isPaused && (
-                <div className={`${!packedDone ? "background-green" : ""} ${renderer.className  }`}>
-                  <Countdown date={Date.now() + timerValue * 20} renderer={renderer} key={sequenceNumber} />
+                <div className={`${renderer.className}`}>
+                  {backgroundColor == "white" ? (
+                    <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />
+                  ):
+                  (
+                      <>
+                        <p style={{color:"white", fontSize:"20px", fontWeight:"bold", border:"1px solid white", padding:"10px", borderRadius:"10px"}}>Packing Done! Next Order in 10 seconds</p>
+                      </>
+                  )}
                 </div>
               )}
             </div>
