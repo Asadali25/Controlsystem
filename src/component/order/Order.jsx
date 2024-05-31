@@ -13,8 +13,9 @@ function Order() {
   const [pauseStartTime, setPauseStartTime] = useState(null);
 
   async function fetchOrders() {
+
     try {
-      const response = await fetch('/data.json');
+      const response = await fetch('https://sheetdb.io/api/v1/e4uzvdx5lllse');
       const data = await response.json();
       setOrders(data);
       console.log("orders", data);
@@ -76,11 +77,12 @@ function Order() {
       console.log("sequenceNumber", newSequenceNumber);
       window.dispatchEvent(new Event('storage'));
     }
-    if (!isPaused) {
+    if (isPaused) {
       startPause(e);
     }
   }
-
+  // AIzaSyD2b_RShJeWpSOl62qFfBNyt79BDuT5pJA
+  // https://docs.google.com/spreadsheets/d/1mjpv5FrqGHtiCSI50HUNuXCtNXSY68vW5d2KFUb_bT0/edit?usp=sharing
   function handleNextOrder(e) {
     e.preventDefault();
     const sequences = new Set(orders.map(order => parseInt(order.sequence, 10)));
@@ -93,7 +95,7 @@ function Order() {
     localStorage.setItem("sequenceNumber", newSequenceNumber);
     console.log("sequenceNumber", newSequenceNumber);
     window.dispatchEvent(new Event('storage'));
-    if (isPaused) {
+    if (!isPaused) {
       startPause(e);
     }
   }
@@ -116,8 +118,8 @@ function Order() {
 
       <div className="row">
         <div className="switch_order">
-          <button onClick={handleNextOrder}>Previous Order</button>
-          <button onClick={handlePreviousOrder}>Next Order</button>
+          <button onClick={handlePreviousOrder}>Previous Order</button>
+          <button onClick={handleNextOrder}>Next Order</button>
         </div>
       </div>
       <div className="row">
