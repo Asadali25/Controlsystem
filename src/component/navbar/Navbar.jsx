@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState, useRef } from "react";
 import { OrderContext } from "../../OrderContext";
 import "./Navbar.css";
 
@@ -18,36 +18,43 @@ const Navbar = () => {
     return savedPausedTime ? parseInt(savedPausedTime, 10) : 0;
   });
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsPaused(localStorage.getItem("isPaused") === "true");
-      const savedPausedTime = localStorage.getItem("pausedTime");
-      if (savedPausedTime) {
-        setPausedTime(parseInt(savedPausedTime, 10));
-      }
-    };
+  const intervalRef = useRef(null);
+  const pauseStartTimeRef = useRef(null);
 
+  const handleStorageChange = () => {
+    setIsPaused(localStorage.getItem("isPaused") === "true");
+    const savedPausedTime = localStorage.getItem("pausedTime");
+    if (savedPausedTime) {
+      setPausedTime(parseInt(savedPausedTime, 10));
+    }
+  };
+
+  React.useEffect(() => {
     window.addEventListener("storage", handleStorageChange);
+
+    if (isPaused) {
+      pauseStartTimeRef.current = Date.now();
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    } else {
+      if (pauseStartTimeRef.current) {
+        const pausedDuration = Math.floor((Date.now() - pauseStartTimeRef.current) / 1000);
+        setPausedTime(prevTime => prevTime + pausedDuration);
+        pauseStartTimeRef.current = null;
+      }
+      intervalRef.current = setInterval(() => {
+        setPausedTime(prevTime => prevTime + 1);
+        localStorage.setItem("pausedTime", pausedTime + 1);
+      }, 1000);
+    }
 
     return () => {
       window.removeEventListener("storage", handleStorageChange);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
-  }, [setIsPaused]);
-
-  useEffect(() => {
-    let interval;
-    if (isPaused) {
-      interval = setInterval(() => {
-        setPausedTime((prevTime) => {
-          const newTime = prevTime + 1;
-          localStorage.setItem("pausedTime", newTime);
-          return newTime;
-        });
-      }, 1000);
-    } else {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
   }, [isPaused]);
 
   const formatTime = (timeInSeconds) => {
@@ -66,7 +73,7 @@ const Navbar = () => {
       </div>
       <div className="navbar-right">
         <div className="time_heading">
-          <span className="time-paused">{isPaused ? "TIME Running" : "TIME Paused"}</span>
+          <span className="time-paused">{!isPaused ? "TIME Running" : "TIME Paused"}</span>
         </div>
         <div className="timer-box">
           <span className="paused-time">{formatTime(pausedTime)}</span>

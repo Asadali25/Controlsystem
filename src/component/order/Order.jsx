@@ -5,33 +5,28 @@ import "./Order.css";
 
 function Order() {
   const navigate = useNavigate();
-  const { orders, setOrders, currentSequenceNumber, setCurrentSequenceNumber, setCurrentOrderNumber, isPaused, setIsPaused } = useContext(OrderContext);
+  const {
+    orders, setOrders, currentSequenceNumber, setCurrentSequenceNumber,
+    setCurrentOrderNumber, isPaused, setIsPaused
+  } = useContext(OrderContext);
   const [pausedTime, setPausedTime] = useState(0);
   const [pauseStartTime, setPauseStartTime] = useState(null);
 
   async function fetchOrders() {
     try {
-      const result = await fetch("https://sheetdb.io/api/v1/tyb2c31tf86n8", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          accept: "application/json",
-        },
-      });
-      const response = await result.json();
-      setOrders(response);
-      console.log("orders", response);
+      const response = await fetch('/data.json');
+      const data = await response.json();
+      setOrders(data);
+      console.log("orders", data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   }
-  
+
   useEffect(() => {
     fetchOrders();
 
-    const interval = setInterval(() => {
-      fetchOrders();
-    }, 360000);
+    const interval = setInterval(fetchOrders, 360000); // Fetch orders every 6 minutes
 
     return () => clearInterval(interval);
   }, []);
@@ -40,7 +35,7 @@ function Order() {
     if (orders.length > 0) {
       const currentOrder = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
       if (currentOrder) {
-        setCurrentOrderNumber(currentOrder.orderNumber);  // Update current order number
+        setCurrentOrderNumber(currentOrder.orderNumber);
       }
     }
   }, [currentSequenceNumber, orders, setCurrentOrderNumber]);
@@ -53,7 +48,7 @@ function Order() {
     } else {
       if (pauseStartTime) {
         const pausedDuration = Math.floor((Date.now() - pauseStartTime) / 1000);
-        setPausedTime(pausedTime + pausedDuration);
+        setPausedTime(prevTime => prevTime + pausedDuration);
         setPauseStartTime(null);
       }
       interval = setInterval(() => {
@@ -62,7 +57,7 @@ function Order() {
     }
 
     return () => clearInterval(interval);
-  }, [isPaused, pauseStartTime, pausedTime]);
+  }, [isPaused, pauseStartTime]);
 
   function startPause(e) {
     e.preventDefault();
@@ -101,12 +96,11 @@ function Order() {
     if (isPaused) {
       startPause(e);
     }
-   
   }
 
-  // Open current order(from gsheet) url in new tab
+  // Open current order URL in new tab
   function openUrl() {
-    const obj = (orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber));
+    const obj = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
     if (obj) {
       window.open(obj.order_url, '_blank');
     }
@@ -116,19 +110,19 @@ function Order() {
     <div className="container order_container">
       <div className="row">
         <div className="program_control">
-          <button type="button" onClick={startPause}>{!isPaused ? 'Start' : 'Pause'} Autoprogram</button>
+          <button type="button" onClick={startPause}>{!isPaused ? 'Pause' : 'Start'} Autoprogram</button>
         </div>
       </div>
 
       <div className="row">
         <div className="switch_order">
-          <button onClick={handlePreviousOrder}>Previous Order</button>
-          <button onClick={handleNextOrder}>Next Order</button>
+          <button onClick={handleNextOrder}>Previous Order</button>
+          <button onClick={handlePreviousOrder}>Next Order</button>
         </div>
       </div>
       <div className="row">
         <div className="program_control">
-          <button type="button" onClick={openUrl}> View Order</button>
+          <button type="button" onClick={openUrl}>View Order</button>
         </div>
       </div>
     </div>

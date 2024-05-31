@@ -135,10 +135,10 @@ const Product = () => {
               <div className="next_order_heading">
                 <h1 className={`next_order_heading `}>TIME TILL NEXT ORDER</h1>
               </div>
-              {!isPaused && (
+              {isPaused && (
                 <div className={`${renderer.className}`}>
                   {backgroundColor == "white" ? (
-                    <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />
+                    <Countdown date={Date.now() + timerValue * 30} renderer={renderer} key={sequenceNumber} />
                   ):
                   (
                       <>
