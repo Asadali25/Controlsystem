@@ -138,7 +138,7 @@ const Product = () => {
               {isPaused && (
                 <div className={`${renderer.className}`}>
                   {backgroundColor == "white" ? (
-                    <Countdown date={Date.now() + timerValue * 30} renderer={renderer} key={sequenceNumber} />
+                    <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />
                   ):
                   (
                       <>
