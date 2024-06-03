@@ -41,6 +41,12 @@
 
 }
 
+.alreadyPacked{
+  padding: 1rem 3rem;
+  background-color: #d60808;
+  color: #fff;
+}
+
 .items {
   display: flex;
   gap: 32px;

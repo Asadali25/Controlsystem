@@ -7,7 +7,6 @@ import './Product.css';
 
 const Product = () => {
   const navigate = useNavigate();
-
   const [packedDone, setPackedDone] = useState(false);
   const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders, isPaused, setIsPaused } = useContext(OrderContext);
   const [sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber);
@@ -16,14 +15,12 @@ const Product = () => {
   const location = useLocation();
   const initialOrders = location.state?.orders || orders;
 
-
   useEffect(() => {
     if (initialOrders.length > 0) {
       setCurrentSequenceNumber(sequenceNumber);
     }
   }, [initialOrders, sequenceNumber, setCurrentSequenceNumber]);
 
-  // Group orders by sequence
   const groupedOrders = initialOrders.reduce((acc, order) => {
     if (!acc[order.sequence]) {
       acc[order.sequence] = [];
@@ -32,9 +29,6 @@ const Product = () => {
     return acc;
   }, {});
 
-
-
-  // Get current sequence orders and total packing time
   const currentSequenceOrders = groupedOrders[sequenceNumber] || [];
   const totalPackingTimeSec = currentSequenceOrders.reduce((total, order) => {
     return total + parseInt(order.packing_time_sec, 10);
@@ -42,7 +36,6 @@ const Product = () => {
 
   const [timerValue, setTimerValue] = useState(totalPackingTimeSec);
 
-  // Effect to reset timer when sequenceNumber changes
   useEffect(() => {
     if (currentSequenceOrders.length > 0) {
       setTimerValue(totalPackingTimeSec);
@@ -50,10 +43,16 @@ const Product = () => {
     }
   }, [sequenceNumber, totalPackingTimeSec, currentSequenceOrders.length, setCurrentOrderNumber, currentSequenceOrders]);
 
-  // Local storage event listener
   useEffect(() => {
     const handleStorageChange = (event) => {
-      console.log('Storage event:', event);
+      const IsCompleted = localStorage.getItem('IsCompleted') === 'true';
+      if (IsCompleted) {
+        setPackedDone(true);
+        console.log(IsCompleted, 'IsCompleted', packedDone, 'packedDone');
+      } else {
+        setPackedDone(false);
+      }
+
       const newSequenceNumber = parseInt(localStorage.getItem('sequenceNumber'), 10);
       if (!isNaN(newSequenceNumber)) {
         setSequenceNumber(newSequenceNumber);
@@ -67,15 +66,14 @@ const Product = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [setIsPaused]);
+  }, [setIsPaused, setSequenceNumber, setPackedDone]);
 
-  // Countdown renderer
   const renderer = ({ minutes, seconds, completed }) => {
     const halfTimeReached = minutes * 60 + seconds <= timerValue / 2;
     const className = halfTimeReached ? "counter half-time" : "counter";
 
     if (completed) {
-      setBackgroundColor('green')
+      setBackgroundColor('green');
       setTimeout(() => {
         const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
         const maxSequence = Math.max(...sequences);
@@ -84,11 +82,14 @@ const Product = () => {
           setSequenceNumber(newSequenceNumber);
           setCurrentSequenceNumber(newSequenceNumber);
           localStorage.setItem('sequenceNumber', newSequenceNumber);
+          localStorage.setItem('IsCompleted', 'false');
           window.dispatchEvent(new Event('storage'));
         }
         setBackgroundColor('white');
         setPackedDone(true);
-      }, 10000);
+        localStorage.setItem('IsCompleted', 'false');
+        window.dispatchEvent(new Event('storage'));
+      }, 5000);
     } else {
       return (
         <span className={className}>
@@ -104,6 +105,12 @@ const Product = () => {
 
   return (
     <div className={`product_parent `} style={{ backgroundColor: backgroundColor }}>
+      {packedDone && (
+        <div className="settings_icon alreadyPacked">
+          Already Packed
+        </div>
+      )}
+
       <div className="container product_container" style={{ width: currentSequenceOrders.length > 4 ? "639.33px" : "940.05px" }}>
         <div className="items">
           {currentSequenceOrders.map((order, index) => (
@@ -138,13 +145,13 @@ const Product = () => {
               {isPaused && (
                 <div className={`${renderer.className}`}>
                   {backgroundColor == "white" ? (
-                    <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />
-                  ):
-                  (
+                    <Countdown date={Date.now() + timerValue * 80} renderer={renderer} key={sequenceNumber} />
+                  ) :
+                    (
                       <>
-                        <p style={{color:"white", fontSize:"20px", fontWeight:"bold", border:"1px solid white", padding:"10px", borderRadius:"10px"}}>Packing Done! Next Order in 10 seconds</p>
+                        <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", border: "1px solid white", padding: "10px", borderRadius: "10px" }}>Packing Done! Next Order in 5 seconds</p>
                       </>
-                  )}
+                    )}
                 </div>
               )}
             </div>
