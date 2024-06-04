@@ -128,6 +128,19 @@ function Order() {
     }
   }
 
+  // Reset everything to start
+  function resetOrders(e) {
+    e.preventDefault();
+    localStorage.clear();
+    setOrders([]);
+    setCurrentSequenceNumber(1);
+    setCurrentOrderNumber(null);
+    setPausedTime(0);
+    setIsPaused(false);
+    fetchOrders();
+    window.dispatchEvent(new Event('storage'));
+  }
+
   return (
     <div className="container order_container">
       <div className="row">
@@ -145,6 +158,11 @@ function Order() {
       <div className="row">
         <div className="program_control">
           <button type="button" onClick={openUrl}>View Order</button>
+        </div>
+      </div>
+      <div className="row">
+        <div className="program_control">
+          <button type="button" onClick={resetOrders}>Reset Orders</button>
         </div>
       </div>
     </div>

@@ -12,16 +12,13 @@ const Product = () => {
   const [sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber);
   const [backgroundColor, setBackgroundColor] = useState('white');
 
-  const location = useLocation();
-  const initialOrders = location.state?.orders || orders;
-
   useEffect(() => {
-    if (initialOrders.length > 0) {
+    if (orders.length > 0) {
       setCurrentSequenceNumber(sequenceNumber);
     }
-  }, [initialOrders, sequenceNumber, setCurrentSequenceNumber]);
+  }, [orders, sequenceNumber, setCurrentSequenceNumber]);
 
-  const groupedOrders = initialOrders.reduce((acc, order) => {
+  const groupedOrders = orders.reduce((acc, order) => {
     if (!acc[order.sequence]) {
       acc[order.sequence] = [];
     }
@@ -125,14 +122,14 @@ const Product = () => {
       </div>
       <div className="container ins_container">
         <div className="row ins_row">
-          {!currentSequenceOrders[0]?.Instructions == "" && (
+          {currentSequenceOrders[0]?.Instructions && (
             <div className="col-lg-6 ins">
               <div className="ins_section">
                 <div className="ins_header">
                   <h1 className="instruction_heading">Specific instructions:</h1>
                 </div>
                 <div className="instruction_content">
-                  <span>{currentSequenceOrders[0]?.Instructions || ""}</span>
+                  <span>{currentSequenceOrders[0]?.Instructions}</span>
                 </div>
               </div>
             </div>
@@ -144,14 +141,13 @@ const Product = () => {
               </div>
               {isPaused && (
                 <div className={`${renderer.className}`}>
-                  {backgroundColor == "white" ? (
+                  {backgroundColor === "white" ? (
                     <Countdown date={Date.now() + timerValue * 80} renderer={renderer} key={sequenceNumber} />
-                  ) :
-                    (
-                      <>
-                        <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", border: "1px solid black", padding: "10px", borderRadius: "10px" }}>Packing Done! Next Order in 5 seconds</p>
-                      </>
-                    )}
+                  ) : (
+                    <>
+                      <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", border: "1px solid black", padding: "10px", borderRadius: "10px" }}>Packing Done! Next Order in 5 seconds</p>
+                    </>
+                  )}
                 </div>
               )}
             </div>
