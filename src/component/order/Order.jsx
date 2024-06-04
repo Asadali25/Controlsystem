@@ -25,13 +25,6 @@ function Order() {
     }
   }
 
-  useEffect(() => {
-    fetchOrders();
-
-    const interval = setInterval(fetchOrders, 360000); // Fetch orders every 6 minutes
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (orders.length > 0) {
@@ -145,7 +138,7 @@ function Order() {
     <div className="container order_container">
       <div className="row">
         <div className="program_control">
-          <button type="button" onClick={startPause}>{!isPaused ? 'Pause' : 'Start'} Autoprogram</button>
+          <button type="button" onClick={startPause}>{!isPaused ? 'Start' : 'Pause'} Autoprogram</button>
         </div>
       </div>
 

@@ -73,7 +73,7 @@ const Navbar = () => {
       </div>
       <div className="navbar-right">
         <div className="time_heading">
-          <span className="time-paused">{!isPaused ? "TIME Running" : "TIME Paused"}</span>
+          <span className="time-paused">{!isPaused ? "TIME Running" : "TIME PAUSED"}</span>
         </div>
         <div className="timer-box">
           <span className="paused-time">{formatTime(pausedTime)}</span>
