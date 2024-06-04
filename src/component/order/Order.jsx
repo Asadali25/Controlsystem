@@ -9,12 +9,11 @@ function Order() {
     orders, setOrders, currentSequenceNumber, setCurrentSequenceNumber,
     setCurrentOrderNumber, isPaused, setIsPaused
   } = useContext(OrderContext);
-  const [pausedTime, setPausedTime] = useState(() => {
-    return parseInt(localStorage.getItem('pausedTime'), 10) || 0;
-  });
+  const [pausedTime, setPausedTime] = useState(0);
   const [pauseStartTime, setPauseStartTime] = useState(null);
 
   async function fetchOrders() {
+
     try {
       const response = await fetch('https://sheetdb.io/api/v1/u66ayocxppnxt');
       const data = await response.json();
@@ -51,31 +50,15 @@ function Order() {
       if (pauseStartTime) {
         const pausedDuration = Math.floor((Date.now() - pauseStartTime) / 1000);
         setPausedTime(prevTime => prevTime + pausedDuration);
-        localStorage.setItem('pausedTime', pausedTime + pausedDuration);
         setPauseStartTime(null);
       }
       interval = setInterval(() => {
-        setPausedTime(prevTime => {
-          const newTime = prevTime + 1;
-          localStorage.setItem('pausedTime', newTime);
-          return newTime;
-        });
+        setPausedTime(prevTime => prevTime + 1);
       }, 1000);
     }
 
     return () => clearInterval(interval);
   }, [isPaused, pauseStartTime]);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsPaused(localStorage.getItem("isPaused") === "true");
-      setCurrentSequenceNumber(parseInt(localStorage.getItem("sequenceNumber"), 10) || 0);
-      setPausedTime(parseInt(localStorage.getItem("pausedTime"), 10) || 0);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
 
   function startPause(e) {
     e.preventDefault();
@@ -93,14 +76,13 @@ function Order() {
       localStorage.setItem("sequenceNumber", newSequenceNumber);
       console.log("sequenceNumber", newSequenceNumber);
       window.dispatchEvent(new Event('storage'));
-      localStorage.setItem('IsCompleted', true);
-      window.dispatchEvent(new Event('storage'));
     }
     if (isPaused) {
       startPause(e);
     }
   }
-
+  // AIzaSyD2b_RShJeWpSOl62qFfBNyt79BDuT5pJA
+  // https://docs.google.com/spreadsheets/d/1mjpv5FrqGHtiCSI50HUNuXCtNXSY68vW5d2KFUb_bT0/edit?usp=sharing
   function handleNextOrder(e) {
     e.preventDefault();
     const sequences = new Set(orders.map(order => parseInt(order.sequence, 10)));
@@ -112,8 +94,6 @@ function Order() {
     setCurrentSequenceNumber(newSequenceNumber);
     localStorage.setItem("sequenceNumber", newSequenceNumber);
     console.log("sequenceNumber", newSequenceNumber);
-    window.dispatchEvent(new Event('storage'));
-    localStorage.setItem('IsCompleted', false);
     window.dispatchEvent(new Event('storage'));
     if (!isPaused) {
       startPause(e);

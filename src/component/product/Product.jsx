@@ -73,7 +73,7 @@ const Product = () => {
     const className = halfTimeReached ? "counter half-time" : "counter";
 
     if (completed) {
-      setBackgroundColor('green');
+      setBackgroundColor('#dafedabb');
       setTimeout(() => {
         const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
         const maxSequence = Math.max(...sequences);
@@ -149,7 +149,7 @@ const Product = () => {
                   ) :
                     (
                       <>
-                        <p style={{ color: "white", fontSize: "20px", fontWeight: "bold", border: "1px solid white", padding: "10px", borderRadius: "10px" }}>Packing Done! Next Order in 5 seconds</p>
+                        <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", border: "1px solid black", padding: "10px", borderRadius: "10px" }}>Packing Done! Next Order in 5 seconds</p>
                       </>
                     )}
                 </div>
