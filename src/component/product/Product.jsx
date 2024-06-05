@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Countdown from 'react-countdown';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { OrderContext } from '../../OrderContext';
@@ -107,8 +107,7 @@ const Product = () => {
           Already Packed
         </div>
       )}
-
-      <div className="container product_container" style={{ width: currentSequenceOrders.length > 4 ? "639.33px" : "940.05px" }}>
+      <div className="container product_container">
         <div className="items">
           {currentSequenceOrders.map((order, index) => (
             <div key={index} className="card card-custom item">
@@ -139,10 +138,10 @@ const Product = () => {
               <div className="next_order_heading">
                 <h1 className={`next_order_heading `}>TIME TILL NEXT ORDER</h1>
               </div>
-              {isPaused && (
+              {!isPaused && (
                 <div className={`${renderer.className}`}>
                   {backgroundColor === "white" ? (
-                    <Countdown date={Date.now() + timerValue * 80} renderer={renderer} key={sequenceNumber} />
+                    <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />
                   ) : (
                     <>
                       <p style={{ color: "black", fontSize: "20px", fontWeight: "bold", border: "1px solid black", padding: "10px", borderRadius: "10px" }}>Packing Done! Next Order in 5 seconds</p>

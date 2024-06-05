@@ -25,6 +25,13 @@ function Order() {
     }
   }
 
+  useEffect(() => {
+    fetchOrders();
+
+    const interval = setInterval(fetchOrders, 360000); // Fetch orders every 6 minutes
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (orders.length > 0) {
@@ -34,30 +41,6 @@ function Order() {
       }
     }
   }, [currentSequenceNumber, orders, setCurrentOrderNumber]);
-
-  useEffect(() => {
-    let interval;
-    if (isPaused) {
-      setPauseStartTime(Date.now());
-      clearInterval(interval);
-    } else {
-      if (pauseStartTime) {
-        const pausedDuration = Math.floor((Date.now() - pauseStartTime) / 1000);
-        setPausedTime(prevTime => prevTime + pausedDuration);
-        localStorage.setItem('pausedTime', pausedTime + pausedDuration);
-        setPauseStartTime(null);
-      }
-      interval = setInterval(() => {
-        setPausedTime(prevTime => {
-          const newTime = prevTime + 1;
-          localStorage.setItem('pausedTime', newTime);
-          return newTime;
-        });
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [isPaused, pauseStartTime]);
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -75,6 +58,8 @@ function Order() {
     const newPausedState = !isPaused;
     setIsPaused(newPausedState);
     localStorage.setItem("isPaused", newPausedState);
+    console.log(newPausedState)
+    console.log(isPaused)
     window.dispatchEvent(new Event('storage'));
   }
 
@@ -138,7 +123,7 @@ function Order() {
     <div className="container order_container">
       <div className="row">
         <div className="program_control">
-          <button type="button" onClick={startPause}>{!isPaused ? 'Start' : 'Pause'} Autoprogram</button>
+          <button type="button" onClick={startPause}>{!isPaused ? 'Pause' : 'Start'} Autoprogram</button>
         </div>
       </div>
 

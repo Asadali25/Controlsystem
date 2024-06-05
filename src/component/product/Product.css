@@ -11,24 +11,15 @@
   height: calc(100vh - 120px);
 }
 
-/* .product_container {
-  width: 60% !important;
-} */
-/* .product_container {
-  width: 60% !important;
-  margin: auto; 
-  display: flex;
-  justify-content: start;
-  align-items: center; 
-} */
 .product_container {
-  /* max-width: 940px; */
-  /* width: 100% !important; */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 90%;
+  margin: 0 auto;
 }
+
 .product_parent.background-green {
   background-color: #dafedabb;
 }
@@ -36,33 +27,33 @@
 .counter.complete {
   color: green;
 }
+
 .card-custom {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
+  padding: 2rem;
+  height: 100%; /* Ensure card occupies full height */
 }
 
-.alreadyPacked{
-  padding: 1rem 3rem;
+.alreadyPacked {
+  padding: 2rem 4rem;
   background-color: #d60808;
   color: #fff;
 }
 
 .items {
   display: flex;
-  gap: 32px;
+  gap: 64px;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
 }
 
 .item {
-  /* max-width: 210.05px;
-  width: 100%; */
-  width: calc(25% - 30px);
-  max-height: 257.53px;
-  height: 100%;
+  width: calc(30% - 40px); /* Adjust width for larger screens */
+  height: 450px; /* Increased fixed height */
+  font-size: 1.5rem;
+  padding: 1rem;
 }
-
 
 .ins_container {
   margin-top: 50px;
@@ -70,9 +61,9 @@
 
 .ins_header h1 {
   font-family: Inter;
-  font-size: 24px;
+  font-size: 2.5rem;
   font-weight: 700;
-  line-height: 29.05px;
+  line-height: 3rem;
   text-align: start;
   margin-left: 40px;
 }
@@ -84,86 +75,58 @@
 
 .instruction_content {
   background: #B4F1FF;
-  width: 503px;
-  height: 107px;
+  width: 600px;
+  height: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 1;
+  font-size: 2rem;
 }
 
 .instruction_content span {
   text-align: center;
 }
 
-
-/* Time Counter */
 .next_order_heading h1 {
   font-family: Inter;
-  font-size: 24px;
+  font-size: 2.5rem;
   font-weight: 700;
-  line-height: 29.05px;
-  text-align: left;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 1;
+  line-height: 3rem;
+  text-align: center;
   margin-bottom: 20px;
-  ;
-
-
 }
 
 .counter {
   margin-top: 20px;
   border-color: #7AB915;
-}
-
-.counter.half-time {
-  /* border-color: #ff0000; */
-  font-weight: bold;
-  color: #000000;
-  border: 2px solid #ff0000;
-  border-radius: 3px;
-  font-size: 18px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  background-color: #FFFFFF;
-  padding-left: 30px;
-  padding-right: 30px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-top: 20px;
-  ;
-  /* change border color when half time remains */
-}
-
-.counter span {
-  font-size: 16px;
-}
-
-.counter {
   font-weight: bold;
   color: #000000;
   border: 2px solid #7AB915;
   border-radius: 3px;
-  font-size: 18px;
+  font-size: 2.5rem;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   background-color: #FFFFFF;
-  padding-left: 30px;
-  padding-right: 30px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-top: 20px;
-  ;
+  padding: 30px 50px;
+}
+
+.counter.half-time {
+  border-color: #ff0000;
+  color: #000000;
+  background-color: #FFFFFF;
+  padding: 30px 50px;
+}
+
+.counter span {
+  font-size: 2rem;
 }
 
 .card-title {
   font-family: Inter;
-  font-size: 16px;
+  font-size: 2rem;
   font-weight: 700;
-  line-height: 19.36px;
+  line-height: 2.5rem;
   text-align: center;
-
 }
 
 .timer_counter {
@@ -181,12 +144,10 @@
   position: absolute;
   left: 100px;
   top: -8px;
-
 }
 
 .setting-icon svg {
-  font-size: 2rem;
-  /* Adjust this value to increase the size */
+  font-size: 3rem;
   cursor: pointer;
 }
 
@@ -206,13 +167,13 @@
     text-align: center;
     margin-left: -40px;
   }
-
 }
 
 @media (max-width: 1024px) {
   .items {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 2fr));
+    background-color: #7AB915;
   }
 
   .ins {
@@ -228,7 +189,120 @@
 
   .timer_counter {
     margin-bottom: 20px;
-    ;
+  }
+}
+
+@media (max-width: 2140px) {
+  .product_container {
+    width: 80%;
+  }
+  .card-custom {
+    width: 35vw;
+    height: 45vh;
+  }
+  .card-title {
+    font-size: 3rem;
+  }
+  .counter {
+    font-size: 2rem;
+    padding: 25px 40px;
+  }
+  .counter span {
+    font-size: 1.5rem;
+  }
+  .setting-icon svg {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-width: 1440px) {
+  .product_container {
+    width: 70%;
+  }
+  .card-custom {
+    width: 40vw;
+    height: 40vh;
+  }
+  .card-title {
+    font-size: 2.5rem;
+  }
+  .counter {
+    font-size: 1.8rem;
+    padding: 20px 35px;
+  }
+  .counter span {
+    font-size: 1.3rem;
+  }
+  .setting-icon svg {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 1366px) {
+  .product_container {
+    width: 60%;
+  }
+  .card-custom {
+    width: 45vw;
+    height: 35vh;
+  }
+  .card-title {
+    font-size: 2rem;
+  }
+  .counter {
+    font-size: 1.5rem;
+    padding: 15px 30px;
+  }
+  .counter span {
+    font-size: 1rem;
+  }
+  .setting-icon svg {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 4000px) {
+  .product_container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .items {
+    width: 50vw;
+    height: 50vh;
   }
 
+  .ins {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .ins h1 {
+    text-align: center;
+    margin-left: -40px;
+  }
+  .card-custom {
+    width: 30vw;
+    height: 50vh;
+  }
+  .card-title {
+    font-size: 3.5rem;
+  }
+  .timer_counter {
+    margin-bottom: 20px;
+  }
+  .ins_row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .setting-icon {
+    position: relative;
+  }
+  .setting-icon svg {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+  }
 }
