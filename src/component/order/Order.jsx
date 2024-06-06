@@ -12,7 +12,6 @@ function Order() {
   const [pausedTime, setPausedTime] = useState(() => {
     return parseInt(localStorage.getItem('pausedTime'), 10) || 0;
   });
-  const [pauseStartTime, setPauseStartTime] = useState(null);
 
   async function fetchOrders() {
     try {
@@ -27,7 +26,6 @@ function Order() {
 
   useEffect(() => {
     fetchOrders();
-
     const interval = setInterval(fetchOrders, 360000); // Fetch orders every 6 minutes
 
     return () => clearInterval(interval);
@@ -57,6 +55,7 @@ function Order() {
     e.preventDefault();
     const newPausedState = !isPaused;
     setIsPaused(newPausedState);
+
     localStorage.setItem("isPaused", newPausedState);
     console.log(newPausedState)
     console.log(isPaused)
@@ -116,6 +115,11 @@ function Order() {
     setPausedTime(0);
     setIsPaused(false);
     fetchOrders();
+    
+    // Dispatch custom event to notify other components
+    const event = new Event('reset');
+    window.dispatchEvent(event);
+
     window.dispatchEvent(new Event('storage'));
   }
 
@@ -139,6 +143,7 @@ function Order() {
         </div>
       </div>
       <div className="row">
+      <p>Please Pause the timer before reseting the orders</p>
         <div className="program_control">
           <button type="button" onClick={resetOrders}>Reset Orders</button>
         </div>

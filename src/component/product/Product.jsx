@@ -45,7 +45,6 @@ const Product = () => {
       const IsCompleted = localStorage.getItem('IsCompleted') === 'true';
       if (IsCompleted) {
         setPackedDone(true);
-        console.log(IsCompleted, 'IsCompleted', packedDone, 'packedDone');
       } else {
         setPackedDone(false);
       }
@@ -63,7 +62,18 @@ const Product = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [setIsPaused, setSequenceNumber, setPackedDone]);
+  }, [setIsPaused, setPackedDone]);
+
+  const updateOrderCompletion = () => {
+    const updatedOrders = orders.map(order => {
+      if (order.sequence === sequenceNumber.toString()) {
+        return { ...order, ordercomplete: true };
+      }
+      return order;
+    });
+    localStorage.setItem('orders', JSON.stringify(updatedOrders));
+    setPackedDone(true);
+  };
 
   const renderer = ({ minutes, seconds, completed }) => {
     const halfTimeReached = minutes * 60 + seconds <= timerValue / 2;
@@ -72,6 +82,7 @@ const Product = () => {
     if (completed) {
       setBackgroundColor('#dafedabb');
       setTimeout(() => {
+        updateOrderCompletion();
         const sequences = Object.keys(groupedOrders).map(key => parseInt(key, 10));
         const maxSequence = Math.max(...sequences);
         if (sequenceNumber < maxSequence) {
@@ -96,9 +107,9 @@ const Product = () => {
     }
   };
 
-  function handleSettingsClick() {
+  const handleSettingsClick = () => {
     window.open('/control', '_blank');
-  }
+  };
 
   return (
     <div className={`product_parent `} style={{ backgroundColor: backgroundColor }}>
@@ -114,6 +125,7 @@ const Product = () => {
               <img className="card-img-top" src={order.image_url} alt="Card cap" />
               <div className="card-body">
                 <h5 className="card-title">1x {order.size}</h5>
+                <p className="order-status">{order.ordercomplete ? "Order Packed" : "Order Not Packed"}</p>
               </div>
             </div>
           ))}
@@ -138,7 +150,7 @@ const Product = () => {
               <div className="next_order_heading">
                 <h1 className={`next_order_heading `}>TIME TILL NEXT ORDER</h1>
               </div>
-              {!isPaused && (
+              {isPaused && (
                 <div className={`${renderer.className}`}>
                   {backgroundColor === "white" ? (
                     <Countdown date={Date.now() + timerValue * 1000} renderer={renderer} key={sequenceNumber} />

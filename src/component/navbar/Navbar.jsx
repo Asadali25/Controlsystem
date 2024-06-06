@@ -38,7 +38,6 @@ const Navbar = () => {
     } else {
       intervalRef.current = setInterval(() => {
         setPausedTime(prevTime => {
-          
           const newTime = prevTime + 1;
           localStorage.setItem("pausedTime", newTime);
           console.log(newTime)
@@ -55,6 +54,24 @@ const Navbar = () => {
     };
   }, [isPaused]);
 
+  // Listen for the custom reset event
+  useEffect(() => {
+    const handleReset = () => {
+      setPausedTime(0);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      localStorage.removeItem("pausedTime");
+      console.log("Reset event handled");
+    };
+
+    window.addEventListener("reset", handleReset);
+
+    return () => {
+      window.removeEventListener("reset", handleReset);
+    };
+  }, []);
+
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
@@ -62,7 +79,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="navbar shadow-lg p-3 mb-5 bg-white rounded">
+<div className="navbar shadow-lg p-3 mb-5 bg-white rounded">
       <div className="navbar-left">
         <span className="time">{currentTime}</span>
       </div>
@@ -82,3 +99,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+    
