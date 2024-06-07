@@ -53,7 +53,7 @@
 }
 
 .ins_header h1 {
-  font-family: Inter;
+  font-family: Poppins;
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 3rem;
@@ -82,7 +82,7 @@
 }
 
 .next_order_heading h1 {
-  font-family: Inter;
+  font-family: Poppins;
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 3rem;
@@ -115,7 +115,7 @@
 }
 
 .card-title {
-  font-family: Inter;
+  font-family: Poppins;
   font-size: 2rem;
   font-weight: 700;
   line-height: 2.5rem;
