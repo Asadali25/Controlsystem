@@ -25,13 +25,6 @@ function Order() {
   }
 
   useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 360000); // Fetch orders every 6 minutes
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     if (orders.length > 0) {
       const currentOrder = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
       if (currentOrder) {
