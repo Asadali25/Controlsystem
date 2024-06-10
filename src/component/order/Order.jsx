@@ -15,7 +15,7 @@ function Order() {
 
   async function fetchOrders() {
     try {
-      const response = await fetch('https://sheetdb.io/api/v1/u66ayocxppnxt');
+      const response = await fetch('https://sheetdb.io/api/v1/mekxq37ux8eax');
       const data = await response.json();
       setOrders(data);
       console.log("orders", data);
