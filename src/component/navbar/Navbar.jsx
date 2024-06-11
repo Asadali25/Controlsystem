@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const [pausedTime, setPausedTime] = useState(() => {
     const savedPausedTime = localStorage.getItem("pausedTime");
-    return savedPausedTime ? parseInt(savedPausedTime, 10) : 0;
+    return savedPausedTime ? parseFloat(savedPausedTime) : 0;
   });
 
   const intervalRef = useRef(null);
@@ -24,13 +24,21 @@ const Navbar = () => {
     setIsPaused(localStorage.getItem("isPaused") === "true");
     const savedPausedTime = localStorage.getItem("pausedTime");
     if (savedPausedTime) {
-      setPausedTime(parseInt(savedPausedTime, 10));
+      setPausedTime(parseFloat(savedPausedTime));
     }
   };
 
   useEffect(() => {
+    const date = new Date();
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    const currentTime = hours + ":" + formattedMinutes;
+  
     window.addEventListener("storage", handleStorageChange);
-
+  
     if (isPaused) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -38,14 +46,14 @@ const Navbar = () => {
     } else {
       intervalRef.current = setInterval(() => {
         setPausedTime(prevTime => {
-          const newTime = prevTime + 1;
+          const newTime = prevTime + 0.5;
           localStorage.setItem("pausedTime", newTime);
           console.log(newTime)
           return newTime;
         });
       }, 1000);
     }
-
+  
     return () => {
       window.removeEventListener("storage", handleStorageChange);
       if (intervalRef.current) {
@@ -74,12 +82,12 @@ const Navbar = () => {
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
+    const seconds = Math.floor(timeInSeconds % 60);
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
 
   return (
-<div className="navbar shadow-lg p-3 mb-5 bg-white rounded">
+    <div className="navbar shadow-lg p-3 mb-5 bg-white rounded">
       <div className="navbar-left">
         <span className="time">{currentTime}</span>
       </div>
@@ -88,7 +96,7 @@ const Navbar = () => {
       </div>
       <div className="navbar-right">
         <div className="time_heading">
-          <span className="time-paused">{!isPaused ? "TIME PAUSED" : "TIME PAUSED"}</span>
+          <span className="time-paused">{!isPaused ? "TIME STARTED" : "TIME PAUSED"}</span>
         </div>
         <div className="timer-box">
           <span className="paused-time">{formatTime(pausedTime)}</span>
@@ -99,5 +107,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-    
