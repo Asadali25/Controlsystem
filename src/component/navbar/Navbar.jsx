@@ -29,14 +29,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const date = new Date();
-    let hours = date.getHours();
-    const minutes = date.getMinutes();
-    hours = hours % 12;
-    hours = hours ? hours : 12; // the hour '0' should be '12'
-    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-    const currentTime = hours + ":" + formattedMinutes;
-  
+
     window.addEventListener("storage", handleStorageChange);
   
     if (isPaused) {
@@ -46,12 +39,12 @@ const Navbar = () => {
     } else {
       intervalRef.current = setInterval(() => {
         setPausedTime(prevTime => {
-          const newTime = prevTime + 0.5;
+          const newTime = prevTime + 0.6;
           localStorage.setItem("pausedTime", newTime);
           console.log(newTime)
           return newTime;
         });
-      }, 1000);
+      }, 1200);
     }
   
     return () => {

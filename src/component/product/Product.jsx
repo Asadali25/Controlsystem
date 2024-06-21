@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Countdown from 'react-countdown';
 import { IoSettingsOutline } from 'react-icons/io5';
 import { OrderContext } from '../../OrderContext';
 import './Product.css';
 
 const Product = () => {
-  const navigate = useNavigate();
   const [packedDone, setPackedDone] = useState(false);
   const { setCurrentOrderNumber, setCurrentSequenceNumber, currentSequenceNumber, orders, isPaused, setIsPaused } = useContext(OrderContext);
   const [sequenceNumber, setSequenceNumber] = useState(currentSequenceNumber);
@@ -45,7 +43,6 @@ const Product = () => {
       const IsCompleted = localStorage.getItem('IsCompleted') === 'true';
       if (IsCompleted) {
         setPackedDone(true);
-        console.log(IsCompleted, 'IsCompleted', packedDone, 'packedDone');
       } else {
         setPackedDone(false);
       }
@@ -56,6 +53,11 @@ const Product = () => {
       }
       const newIsPaused = localStorage.getItem('isPaused') === 'true';
       setIsPaused(newIsPaused);
+
+      if (localStorage.getItem('orderSkipped') === 'true') {
+        localStorage.removeItem('orderSkipped');
+        window.location.reload();
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -86,7 +88,6 @@ const Product = () => {
         setPackedDone(true);
         localStorage.setItem('IsCompleted', 'false');
         window.dispatchEvent(new Event('storage'));
-        const orders = localStorage.getItem('orders')
       }, 5000);
     } else {
       return (

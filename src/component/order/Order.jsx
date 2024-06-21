@@ -1,10 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
 import { OrderContext } from "../../OrderContext";
 import "./Order.css";
 
 function Order() {
-  const navigate = useNavigate();
   const {
     orders, setOrders, currentSequenceNumber, setCurrentSequenceNumber,
     setCurrentOrderNumber, isPaused, setIsPaused
@@ -18,7 +16,6 @@ function Order() {
       const response = await fetch('https://sheetdb.io/api/v1/mekxq37ux8eax');
       const data = await response.json();
       setOrders(data);
-      console.log("orders", data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -50,8 +47,6 @@ function Order() {
     setIsPaused(newPausedState);
 
     localStorage.setItem("isPaused", newPausedState);
-    console.log(newPausedState)
-    console.log(isPaused)
     window.dispatchEvent(new Event('storage'));
   }
 
@@ -61,7 +56,6 @@ function Order() {
       const newSequenceNumber = currentSequenceNumber - 1;
       setCurrentSequenceNumber(newSequenceNumber);
       localStorage.setItem("sequenceNumber", newSequenceNumber);
-      console.log("sequenceNumber", newSequenceNumber);
       window.dispatchEvent(new Event('storage'));
       localStorage.setItem('IsCompleted', true);
       window.dispatchEvent(new Event('storage'));
@@ -75,13 +69,11 @@ function Order() {
     e.preventDefault();
     const sequences = new Set(orders.map(order => parseInt(order.sequence, 10)));
     if (currentSequenceNumber >= Math.max(...sequences)) {
-      console.log("No more orders");
       return;
     }
     const newSequenceNumber = currentSequenceNumber + 1;
     setCurrentSequenceNumber(newSequenceNumber);
     localStorage.setItem("sequenceNumber", newSequenceNumber);
-    console.log("sequenceNumber", newSequenceNumber);
     window.dispatchEvent(new Event('storage'));
     localStorage.setItem('IsCompleted', false);
     window.dispatchEvent(new Event('storage'));
@@ -90,15 +82,43 @@ function Order() {
     }
   }
 
-  // Open current order URL in new tab
   function openUrl() {
     const obj = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
     if (obj) {
       window.open(obj.order_url, '_blank');
     }
   }
+  function skipOrder(e) {
+    e.preventDefault();
+    const currentOrder = orders.find(order => parseInt(order.sequence, 10) === currentSequenceNumber);
+    if (!currentOrder) return;
+  
+    // Remove the current order from orders array
+    const newOrders = orders.filter(order => parseInt(order.sequence, 10) !== currentSequenceNumber);
+  
+    // Update sequence numbers of remaining orders
+    newOrders.forEach((order, index) => {
+      order.sequence = (index + 1).toString();
+    });
+  
+    // Add the skipped order back to the end with updated sequence number
+    newOrders.push({ ...currentOrder, sequence: (newOrders.length + 1).toString() });
+  
+    // Update state and local storage
+    setOrders(newOrders);
+    localStorage.setItem('orders', JSON.stringify(newOrders));
+    localStorage.setItem('orderSkipped', 'true');
+    window.dispatchEvent(new Event('storage'));
+  
+    // Determine the correct next sequence number to display
+    let newSequenceNumber = currentSequenceNumber;  
+    // Set the correct sequence number
+    setCurrentSequenceNumber(newSequenceNumber);
+    localStorage.setItem('sequenceNumber', newSequenceNumber.toString());
+    window.dispatchEvent(new Event('storage'));
+  }
+  
 
-  // Reset everything to start
   function resetOrders(e) {
     e.preventDefault();
     localStorage.clear();
@@ -108,11 +128,9 @@ function Order() {
     setPausedTime(0);
     setIsPaused(false);
     fetchOrders();
-    
-    // Dispatch custom event to notify other components
+
     const event = new Event('reset');
     window.dispatchEvent(event);
-
     window.dispatchEvent(new Event('storage'));
   }
 
@@ -136,7 +154,10 @@ function Order() {
         </div>
       </div>
       <div className="row">
-      <p>Please Pause the timer before reseting the orders</p>
+        <div className="program_control">
+          <button type="button" onClick={skipOrder}>Skip This Order</button>
+        </div>
+        <p>Please Pause the timer before resetting the orders</p>
         <div className="program_control">
           <button type="button" onClick={resetOrders}>Reset Orders</button>
         </div>
